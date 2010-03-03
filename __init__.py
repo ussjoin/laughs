@@ -30,6 +30,9 @@ class TahoeFile(object):
 		body = res.content
 		self.info = json.loads(body)
 		self.info = self.info[1]
+		self.rocap = self.info.get('ro_uri')
+		self.rwcap = self.info.get('rw_uri')
+		self.vcap = self.info.get('verify_uri')
 	
 	def getURI(self):
 		return self.baseuri + self.rocap
@@ -70,10 +73,19 @@ class TahoeFile(object):
 			res = urlfetch.fetch(uri + "?t=mkdir", method=urlfetch.POST)
 			newrwcap = res.content
 			self.addchild(name, newrwcap)
+			return True
 		else:
-			return false
+			return False
 		
-	def put(self):
-		pass
+	def delete(self):
+		if (self.rwcap != ''):
+			uri = self.baseuri + self.rwcap
+			res = urlfetch.fetch(uri, method=urlfetch.DELETE)
+			if (res.status_code == 200):
+				return True
+			else:
+				return res
+		return False
+		
 	
 
